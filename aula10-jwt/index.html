@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>IMAGEM NA API</h1>
+
+    <img src="http://localhost:5010/public/storage/8d29a993f91750fbef1f67c5c7a1beec" alt="">
+
+        <h2>Provas</h2>
+        <div id="provas"></div>
+
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="email" required />
+            <input type="password" id="senha" placeholder="senha" required />
+            <button type="submit">Login</button>
+        </form>
+
+        <script>
+            async function loadProvas() {
+                const res = await fetch('http://localhost:5010/provas')
+                const provas = await res.json()
+                const container = document.getElementById('provas')
+                container.innerHTML = ''
+                provas.forEach(p => {
+                    const el = document.createElement('div')
+                    el.textContent = `${p.id} - ${p.titulo}`
+                    container.appendChild(el)
+                })
+            }
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const email = document.getElementById('email').value
+                const senha = document.getElementById('senha').value
+                const res = await fetch('http://localhost:5010/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    localStorage.setItem('token', data.token)
+                    alert('Logado! token salvo em localStorage')
+                }
+                else {
+                    alert('Falha no login')
+                }
+            })
+
+            loadProvas()
+        </script>
+</body>
+</html>
