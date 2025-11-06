@@ -1,55 +1,40 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const KEY = 'borapracima'
+dotenv.config();
 
-
-export function generateToken(userInfo) {
-  if (!userInfo.role)
-    userInfo.role = 'user';
-
-  return jwt.sign(userInfo, KEY)
-}
-
-export function getTokenInfo(req) {
-  try {
-    let token = req.headers['x-access-token'];
-
-    if (token === undefined)
-      token = req.query['x-access-token']
-
-    let signd = jwt.verify(token, KEY);
-    return signd;
-  }
-  catch {
-    return null;
-  }
-}
-
-export function getAuthentication(checkRole, throw401 = true) {  
+export function getAuthentication(checkRole, throw401 = true) {
   return (req, resp, next) => {
     try {
       let token = req.headers['x-access-token'];
-  
-      if (token === undefined)
+
+      if (!token) {
         token = req.query['x-access-token'];
-    
-      let signd = jwt.verify(token, KEY);
-    
-      req.user = signd;
-      if (checkRole && !checkRole(signd) && signd.role.type !== 'admin')
-        return resp.status(403).end();
-    
-      next();
-    }
-    catch {
-      if (throw401) {
-        let error = new Error();
-        error.stack = 'Authentication Error: JWT must be provided';
-        resp.status(401).end();
       }
-      else {
+
+      if (!token) {
+        if (throw401) {
+          return resp.status(401).json({ error: 'Token não fornecido' });
+        } else {
+          return next();
+        }
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+
+      if (checkRole && !checkRole(decoded)) {
+        return resp.status(403).json({ error: 'Acesso não autorizado' });
+      }
+
+      next();
+    } catch (err) {
+      console.error(err);
+      if (throw401) {
+        return resp.status(401).json({ error: 'Token inválido ou expirado' });
+      } else {
         next();
       }
     }
-  }
+  };
 }

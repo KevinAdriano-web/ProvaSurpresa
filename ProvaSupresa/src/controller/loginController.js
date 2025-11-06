@@ -1,6 +1,9 @@
-import express from 'express'
-import loginRepository from '../repository/loginRepository.js'
-import { generateToken } from '../utils/jwt.js'
+import express from 'express';
+import loginRepository from '../repository/loginRepository.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router()
 
@@ -11,7 +14,6 @@ router.post('/login', async (req, resp) => {
     if (!user || user.senha !== senha)
       return resp.status(401).json({ error: 'invalid_credentials' })
 
-    // remove senha from response
     const safeUser = { id: user.id, email: user.email, role: user.role }
     const token = generateToken(safeUser)
     return resp.json({ token, user: safeUser })
