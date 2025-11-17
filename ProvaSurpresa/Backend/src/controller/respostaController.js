@@ -19,7 +19,15 @@ router.post('/respostas', getAuthentication(null), async (req, resp) => {
       }
     }
 
-    resp.status(201).json({ id: provaRespostaId })
+    // Compute score (number of correct alternatives and total answered)
+    try {
+      const score = await provaRespostaRepository.computeScore(provaRespostaId)
+      resp.status(201).json({ id: provaRespostaId, score })
+    } catch (scoreErr) {
+      console.error('Error computing score:', scoreErr)
+      // return at least the id if scoring fails
+      resp.status(201).json({ id: provaRespostaId })
+    }
   }
   catch (err) {
     console.error(err)
@@ -30,7 +38,7 @@ router.post('/respostas', getAuthentication(null), async (req, resp) => {
 router.get('/respostas/me', getAuthentication(null), async (req, resp) => {
   try {
     const loginId = req.user.id
-    const rows = await provaRespostaRepository.listByLogin(loginId)
+    const rows = await provaRespostaRepository.listByLoginWithScore(loginId)
     resp.json(rows)
   }
   catch (err) {

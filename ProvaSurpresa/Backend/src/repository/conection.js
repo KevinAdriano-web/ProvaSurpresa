@@ -20,14 +20,22 @@ if (senha.startsWith("'") && senha.endsWith("'")) {
   senha = senha.slice(1, -1)
 }
 
-let conection = await mysql.createConnection({
-  host: process.env.MYSQL_HOST || 'localhost',
-  user: process.env.MYSQL_USER || 'root',
-  password: senha,
-  database: process.env.MYSQL_DATABASE || 'provaweb2'
-})
+let conection = null
 
-console.log('✓ Conectado ao banco de dados:', process.env.MYSQL_DATABASE)
+try {
+  conection = await mysql.createConnection({
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'root',
+    password: senha,
+    database: process.env.MYSQL_DATABASE || 'provaweb2'
+  })
+
+  console.log('✓ Conectado ao banco de dados:', process.env.MYSQL_DATABASE)
+} catch (err) {
+  console.error('✗ Falha ao conectar ao banco de dados. A API continuará rodando, mas chamadas ao DB vão falhar.')
+  console.error(err && err.stack ? err.stack : err)
+  // keep conection null to avoid crashes; repository code should handle nulls or will throw on usage
+}
 
 export { conection }
 

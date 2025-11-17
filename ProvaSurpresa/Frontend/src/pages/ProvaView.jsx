@@ -63,15 +63,21 @@ function ProvaView() {
         alternativa: parseInt(alternativa)
       }))
 
-      await api.post('/respostas', {
+      const r = await api.post('/respostas', {
         prova: parseInt(id),
         itens
       })
 
-      setSuccess(true)
+      // If API returned score, show it immediately
+      if (r.data && r.data.score) {
+        setSuccess({ score: r.data.score })
+      } else {
+        setSuccess(true)
+      }
+
       setTimeout(() => {
         navigate('/minhas-respostas')
-      }, 2000)
+      }, 3000)
     } catch (err) {
       console.error(err)
       setError('Erro ao submeter respostas. Tente novamente.')
@@ -121,7 +127,16 @@ function ProvaView() {
         <div className="container">
           <div className="success">
             <h2>Prova submetida com sucesso!</h2>
-            <p>Redirecionando para suas respostas...</p>
+            {success.score ? (
+              <div>
+                <p>
+                  <strong>Sua pontuação:</strong> {success.score.corretas} / {success.score.total}
+                </p>
+                <p>Redirecionando para suas respostas...</p>
+              </div>
+            ) : (
+              <p>Redirecionando para suas respostas...</p>
+            )}
           </div>
         </div>
       </div>

@@ -76,6 +76,11 @@ function MinhasRespostas() {
                 <p>
                   <strong>ID da Resposta:</strong> {resposta.id}
                 </p>
+                {typeof resposta.corretas !== 'undefined' && (
+                  <p>
+                    <strong>Pontuação:</strong> {resposta.corretas} / {resposta.total}
+                  </p>
+                )}
               </div>
             ))}
           </div>
