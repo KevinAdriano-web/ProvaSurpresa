@@ -1,13 +1,24 @@
 import jwt from 'jsonwebtoken'
 
-const KEY = 'borapracima'
+// Prefer environment variable for secret; keep fallback for compatibility
+const KEY = process.env.JWT_SECRET || 'borapracima'
 
+if (!process.env.JWT_SECRET) {
+  // warn in non-production environments only
+  try {
+    const env = process.env.NODE_ENV || 'development'
+    if (env !== 'production') {
+      console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
+    }
+  } catch (e) {
+    // ignore
+  }
+}
 
 export function generateToken(userInfo) {
-  if (!userInfo.role)
-    userInfo.role = 'user';
-
-  return jwt.sign(userInfo, KEY)
+  const payload = { ...userInfo }
+  if (!payload.role) payload.role = 'user'
+  return jwt.sign(payload, KEY)
 }
 
 export function getTokenInfo(req) {
