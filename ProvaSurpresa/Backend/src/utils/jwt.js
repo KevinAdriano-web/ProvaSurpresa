@@ -1,17 +1,17 @@
 import jwt from 'jsonwebtoken'
 
-// Prefer environment variable for secret; keep fallback for compatibility
+// Preferir variável de ambiente para a chave secreta; manter fallback por compatibilidade
 const KEY = process.env.JWT_SECRET || 'borapracima'
 
 if (!process.env.JWT_SECRET) {
-  // warn in non-production environments only
+  // avisar apenas em ambientes não-produtivos
   try {
     const env = process.env.NODE_ENV || 'development'
     if (env !== 'production') {
       console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
     }
   } catch (e) {
-    // ignore
+    // ignorar
   }
 }
 
@@ -25,7 +25,7 @@ export function getTokenInfo(req) {
   try {
     let token = req.headers['x-access-token'] || req.query['x-access-token'];
 
-    // support Authorization: Bearer <token>
+    // suporte ao cabeçalho Authorization: Bearer <token>
     if (!token && req.headers['authorization']) {
       const auth = req.headers['authorization']
       if (auth.startsWith('Bearer ')) {
@@ -64,7 +64,7 @@ export function getAuthentication(checkRole, throw401 = true) {
     
       req.user = signd;
       if (checkRole) {
-        // checkRole can be a function that returns true/false based on token payload
+        // checkRole pode ser uma função que retorna true/false com base no payload do token
         const ok = checkRole(signd)
         const roleIsAdmin = (signd && (signd.role === 'admin' || (signd.role && signd.role.type === 'admin')))
         if (!ok && !roleIsAdmin) return resp.status(403).end()

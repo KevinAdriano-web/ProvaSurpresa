@@ -1,0 +1,27 @@
+{
+  "titulo": "Prova de Matemática Básica",
+  "perguntas": [
+    {
+      "ordem": 1,
+      "pergunta": "Quanto é 2 + 2?",
+      "imagem": "",
+      "alternativas": [
+        { "descricao": "3", "correta": false },
+        { "descricao": "4", "correta": true },
+        { "descricao": "5", "correta": false },
+        { "descricao": "6", "correta": false }
+      ]
+    },
+    {
+      "ordem": 2,
+      "pergunta": "Qual é a raiz quadrada de 16?",
+      "imagem": "",
+      "alternativas": [
+        { "descricao": "2", "correta": false },
+        { "descricao": "3", "correta": false },
+        { "descricao": "4", "correta": true },
+        { "descricao": "5", "correta": false }
+      ]
+    }
+  ]
+}

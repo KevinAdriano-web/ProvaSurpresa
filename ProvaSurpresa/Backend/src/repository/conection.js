@@ -34,7 +34,7 @@ try {
 } catch (err) {
   console.error('✗ Falha ao conectar ao banco de dados. A API continuará rodando, mas chamadas ao DB vão falhar.')
   console.error(err && err.stack ? err.stack : err)
-  // keep conection null to avoid crashes; repository code should handle nulls or will throw on usage
+  // manter `conection` como null para evitar travamentos; o código do repositório deve tratar nulls ou lançará erro ao usar
 }
 
 export { conection }

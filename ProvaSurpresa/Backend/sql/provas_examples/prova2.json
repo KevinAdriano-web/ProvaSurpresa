@@ -1,0 +1,38 @@
+{
+  "titulo": "Prova de Conhecimentos Gerais",
+  "perguntas": [
+    {
+      "ordem": 1,
+      "pergunta": "Qual é a capital do Brasil?",
+      "imagem": "",
+      "alternativas": [
+        { "descricao": "São Paulo", "correta": false },
+        { "descricao": "Brasília", "correta": true },
+        { "descricao": "Rio de Janeiro", "correta": false },
+        { "descricao": "Salvador", "correta": false }
+      ]
+    },
+    {
+      "ordem": 2,
+      "pergunta": "Em que ano o homem chegou à Lua pela primeira vez?",
+      "imagem": "",
+      "alternativas": [
+        { "descricao": "1959", "correta": false },
+        { "descricao": "1969", "correta": true },
+        { "descricao": "1979", "correta": false },
+        { "descricao": "1989", "correta": false }
+      ]
+    },
+    {
+      "ordem": 3,
+      "pergunta": "Qual elemento químico tem símbolo 'O'?",
+      "imagem": "",
+      "alternativas": [
+        { "descricao": "Ouro", "correta": false },
+        { "descricao": "Oxigênio", "correta": true },
+        { "descricao": "Prata", "correta": false },
+        { "descricao": "Hidrogênio", "correta": false }
+      ]
+    }
+  ]
+}
