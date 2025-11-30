@@ -101,7 +101,3 @@ O frontend estará disponível em `http://localhost:3000` e, em desenvolvimento,
 - Migrar token para cookie `HttpOnly` se desejar maior proteção contra XSS.
 - Adicionar rate-limiting nas rotas sensíveis (`/login`, `/register`).
 - Criar scripts de migração/seed para o banco de dados e testes automatizados.
-
----
-
-Se quiser, eu posso abrir um PR com essas mudanças e adicionar testes ou implementar refresh tokens a seguir. Diga qual alteração prefere que eu faça a seguir.
