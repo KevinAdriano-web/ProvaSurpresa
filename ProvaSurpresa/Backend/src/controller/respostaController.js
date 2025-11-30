@@ -4,7 +4,7 @@ import { getAuthentication } from '../utils/jwt.js'
 
 const router = express.Router()
 
-// Submit a prova resposta: body { prova, itens: [ { pergunta, alternativa } ] }
+// Enviar uma resposta de prova: body { prova, itens: [ { pergunta, alternativa } ] }
 router.post('/respostas', getAuthentication(null), async (req, resp) => {
   try {
     const loginId = req.user.id
@@ -19,13 +19,13 @@ router.post('/respostas', getAuthentication(null), async (req, resp) => {
       }
     }
 
-    // Compute score (number of correct alternatives and total answered)
+    // Calcular pontuação (número de alternativas corretas e total respondido)
     try {
       const score = await provaRespostaRepository.computeScore(provaRespostaId)
       resp.status(201).json({ id: provaRespostaId, score })
     } catch (scoreErr) {
       console.error('Error computing score:', scoreErr)
-      // return at least the id if scoring fails
+      // retornar pelo menos o id se a correção falhar
       resp.status(201).json({ id: provaRespostaId })
     }
   }

@@ -11,7 +11,7 @@ router.post('/login', async (req, resp) => {
     email = typeof email === 'string' ? email.trim().toLowerCase() : ''
     senha = typeof senha === 'string' ? senha : ''
 
-    // Basic validation
+    // Validação básica
     if (!email) return resp.status(400).json({ error: 'email_obrigatorio', message: 'Email é obrigatório' })
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) return resp.status(400).json({ error: 'email_invalido', message: 'Email inválido' })
@@ -24,7 +24,7 @@ router.post('/login', async (req, resp) => {
     const match = await bcrypt.compare(senha, user.senha || '')
     if (!match) return resp.status(401).json({ error: 'invalid_credentials' })
 
-    // remove senha from response
+    // remover senha da resposta
     const safeUser = { id: user.id, email: user.email, role: user.role }
     const token = generateToken(safeUser)
     return resp.json({ token, user: safeUser })
@@ -41,7 +41,7 @@ router.post('/register', async (req, resp) => {
     email = typeof email === 'string' ? email.trim().toLowerCase() : ''
     senha = typeof senha === 'string' ? senha : ''
 
-    // Basic validation
+    // Validação básica
     if (!email) return resp.status(400).json({ error: 'email_obrigatorio', message: 'Email é obrigatório' })
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) return resp.status(400).json({ error: 'email_invalido', message: 'Email inválido' })
@@ -54,7 +54,7 @@ router.post('/register', async (req, resp) => {
     if (existing)
       return resp.status(400).json({ error: 'email_exists' })
 
-    // Hash password before storing
+    // Gerar hash da senha antes de armazenar
     const saltRounds = 10
     const hash = await bcrypt.hash(senha, saltRounds)
 

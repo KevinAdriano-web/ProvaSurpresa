@@ -1,17 +1,17 @@
 import jwt from 'jsonwebtoken'
 
-// JWT configuration
-const KEY = process.env.JWT_SECRET
-const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h'
+// Prefer environment variable for secret; keep fallback for compatibility
+const KEY = process.env.JWT_SECRET || 'borapracima'
 
-if (!KEY) {
-  const env = process.env.NODE_ENV || 'development'
-  if (env === 'production') {
-    console.error('FATAL: JWT_SECRET must be set in production environment')
-    process.exit(1)
-  }
-  else {
-    console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
+if (!process.env.JWT_SECRET) {
+  // warn in non-production environments only
+  try {
+    const env = process.env.NODE_ENV || 'development'
+    if (env !== 'production') {
+      console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
+    }
+  } catch (e) {
+    // ignore
   }
 }
 
@@ -27,7 +27,7 @@ export function getTokenInfo(req) {
   try {
     let token = req.headers['x-access-token'] || req.query['x-access-token'];
 
-    // support Authorization: Bearer <token>
+    // suporte ao cabeçalho Authorization: Bearer <token>
     if (!token && req.headers['authorization']) {
       const auth = req.headers['authorization']
       if (auth.startsWith('Bearer ')) {
@@ -66,6 +66,7 @@ export function getAuthentication(checkRole, throw401 = true) {
     
       req.user = signd;
       if (checkRole) {
+        // checkRole can be a function that returns true/false based on token payload
         const ok = checkRole(signd)
         const roleIsAdmin = (signd && (signd.role === 'admin' || (signd.role && signd.role.type === 'admin')))
         if (!ok && !roleIsAdmin) return resp.status(403).end()

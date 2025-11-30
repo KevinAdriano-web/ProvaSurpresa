@@ -30,13 +30,13 @@ router.get('/provas/:id', async (req, resp) => {
   }
 })
 
-// Protected: create prova with perguntas and alternativas
-// Only professors can create provas
+// Rota protegida: criar prova com perguntas e alternativas
+// Apenas professores podem criar provas
 router.post('/provas', getAuthentication(u => u && u.role === 'professor'), async (req, resp) => {
   try {
     const { titulo, perguntas } = req.body
 
-    // Basic validation
+    // Validação básica
     if (!titulo || typeof titulo !== 'string' || !titulo.trim()) {
       return resp.status(400).json({ error: 'titulo_obrigatorio', message: 'O título da prova é obrigatório' })
     }
@@ -45,7 +45,7 @@ router.post('/provas', getAuthentication(u => u && u.role === 'professor'), asyn
       return resp.status(400).json({ error: 'perguntas_obrigatorias', message: 'A prova deve conter ao menos uma pergunta' })
     }
 
-    // enforce reasonable limits and sanitize
+    // aplicar limites razoáveis e sanitizar
     const MAX_PERGUNTAS = 100
     const MAX_ALTERNATIVAS = 10
     const MAX_TITULO = 200
@@ -88,7 +88,7 @@ router.post('/provas', getAuthentication(u => u && u.role === 'professor'), asyn
           return resp.status(400).json({ error: 'alternativa_longa', message: `Pergunta ${i + 1}, alternativa ${j + 1} excede ${MAX_ALTERNATIVA_LEN} caracteres` })
         }
 
-        // coerce correta to boolean
+        // converter `correta` para booleano
         if (a.correta === true || a.correta === 'true') temCorreta = true
       }
 

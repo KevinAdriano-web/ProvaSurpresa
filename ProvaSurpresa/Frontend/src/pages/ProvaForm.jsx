@@ -56,7 +56,7 @@ function ProvaForm() {
     const newPerguntas = [...perguntas]
     newPerguntas[perguntaIndex].alternativas[altIndex][field] = value
     
-    // If setting this as correct, unset others
+    // Se marcar como correta, desmarcar as outras
     if (field === 'correta' && value === true) {
       newPerguntas[perguntaIndex].alternativas.forEach((alt, i) => {
         if (i !== altIndex) alt.correta = false
@@ -70,7 +70,7 @@ function ProvaForm() {
     e.preventDefault()
     setError('')
     
-    // Validation
+    // Validação
     if (!titulo.trim()) {
       setError('Título da prova é obrigatório')
       return

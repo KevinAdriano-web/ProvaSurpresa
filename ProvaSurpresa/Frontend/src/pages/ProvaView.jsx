@@ -48,7 +48,7 @@ function ProvaView() {
     e.preventDefault()
     setError('')
 
-    // Check if all questions are answered
+    // Verificar se todas as perguntas foram respondidas
     const unanswered = prova.perguntas.filter(p => !respostas[p.id])
     if (unanswered.length > 0) {
       setError('Por favor, responda todas as perguntas antes de submeter')
@@ -68,7 +68,7 @@ function ProvaView() {
         itens
       })
 
-      // If API returned score, show it immediately
+      // Se a API retornou pontuação, mostrá-la imediatamente
       if (r.data && r.data.score) {
         setSuccess({ score: r.data.score })
       } else {
