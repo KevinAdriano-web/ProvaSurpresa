@@ -1,24 +1,26 @@
 import jwt from 'jsonwebtoken'
 
-// Prefer environment variable for secret; keep fallback for compatibility
-const KEY = process.env.JWT_SECRET || 'borapracima'
+// JWT configuration
+const KEY = process.env.JWT_SECRET
+const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h'
 
-if (!process.env.JWT_SECRET) {
-  // warn in non-production environments only
-  try {
-    const env = process.env.NODE_ENV || 'development'
-    if (env !== 'production') {
-      console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
-    }
-  } catch (e) {
-    // ignore
+if (!KEY) {
+  const env = process.env.NODE_ENV || 'development'
+  if (env === 'production') {
+    console.error('FATAL: JWT_SECRET must be set in production environment')
+    process.exit(1)
+  }
+  else {
+    console.warn('WARNING: using fallback JWT secret. Set JWT_SECRET in environment for better security.')
   }
 }
+
+const SECRET_KEY = KEY || 'borapracima'
 
 export function generateToken(userInfo) {
   const payload = { ...userInfo }
   if (!payload.role) payload.role = 'user'
-  return jwt.sign(payload, KEY)
+  return jwt.sign(payload, SECRET_KEY, { expiresIn: EXPIRES_IN })
 }
 
 export function getTokenInfo(req) {
@@ -38,7 +40,7 @@ export function getTokenInfo(req) {
 
     if (!token) return null
 
-    const signd = jwt.verify(token, KEY)
+    const signd = jwt.verify(token, SECRET_KEY)
     return signd
   }
   catch (err) {
@@ -60,11 +62,10 @@ export function getAuthentication(checkRole, throw401 = true) {
 
       if (!token) throw new Error('No token')
 
-      const signd = jwt.verify(token, KEY)
+      const signd = jwt.verify(token, SECRET_KEY)
     
       req.user = signd;
       if (checkRole) {
-        // checkRole can be a function that returns true/false based on token payload
         const ok = checkRole(signd)
         const roleIsAdmin = (signd && (signd.role === 'admin' || (signd.role && signd.role.type === 'admin')))
         if (!ok && !roleIsAdmin) return resp.status(403).end()
@@ -75,8 +76,6 @@ export function getAuthentication(checkRole, throw401 = true) {
     catch (err) {
       console.error('getAuthentication error:', err && err.stack ? err.stack : err)
       if (throw401) {
-        let error = new Error();
-        error.stack = 'Authentication Error: JWT must be provided';
         resp.status(401).end();
       }
       else {

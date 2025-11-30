@@ -11,7 +11,7 @@ dotenv.config({ path: join(__dirname, '../../.env') })
 console.log('🔍 Variáveis carregadas do .env:')
 console.log('- Host:', process.env.MYSQL_HOST)
 console.log('- User:', process.env.MYSQL_USER)
-console.log('- Password:', process.env.MYSQL_PASSWORD ? '***' : '(VAZIA - ERRO!)')
+console.log('- Password set:', !!process.env.MYSQL_PASSWORD)
 console.log('- Database:', process.env.MYSQL_DATABASE)
 
 // Remover aspas da senha se houver
@@ -32,9 +32,9 @@ try {
 
   console.log('✓ Conectado ao banco de dados:', process.env.MYSQL_DATABASE)
 } catch (err) {
-  console.error('✗ Falha ao conectar ao banco de dados. A API continuará rodando, mas chamadas ao DB vão falhar.')
+  console.error('✗ Falha ao conectar ao banco de dados. A API não pode iniciar sem o banco.')
   console.error(err && err.stack ? err.stack : err)
-  // keep conection null to avoid crashes; repository code should handle nulls or will throw on usage
+  process.exit(1)
 }
 
 export { conection }

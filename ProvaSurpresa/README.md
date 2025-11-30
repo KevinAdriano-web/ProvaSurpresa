@@ -1,8 +1,17 @@
-# Sistema Prova Surpresa
+# ProvaSurpresa
 
-Sistema completo de provas online com backend em Node.js/Express e frontend em React.
+**Nome do projeto:** ProvaSurpresa
 
-## Estrutura do Projeto
+**Descrição:** Plataforma de provas online para criação e aplicação rápida de questionários com pontuação automática, controle de papéis (aluno/professor) e interface web moderna.
+
+## Visão geral
+
+Este repositório contém uma aplicação full-stack com:
+
+- Backend: API REST construída com Node.js e Express, usando MySQL para persistência.
+- Frontend: SPA em React + Vite, com autenticação por JWT e chamadas via Axios.
+
+## Estrutura do projeto
 
 ```
 ProvaSurpresa/
@@ -33,101 +42,66 @@ ProvaSurpresa/
 - MySQL 8+
 - npm ou yarn
 
-## Configuração do Banco de Dados
-
-1. Execute o script SQL em `Backend/sql/ddl.sql` para criar as tabelas
-2. Configure a conexão no arquivo `Backend/src/repository/conection.js`
-
-## Instalação
+## Instalação e execução (local)
 
 ### Backend
 
-```bash
-cd Backend
-npm install
-npm start
+1. Vá para a pasta do backend:
+
+```powershell
+cd 'c:\projects\Projetos - Programação Web\Projeto Forms\ProvaSurpresa-2.0\ProvaSurpresa\Backend'
 ```
 
-O backend estará disponível em `http://localhost:5010`
+2. Instale dependências e configure variáveis de ambiente em um arquivo `.env` (copie `.env.example`):
+
+```powershell
+npm install
+# editar .env para definir MYSQL_* e JWT_SECRET e opcionalmente FRONTEND_URL
+npm run start
+```
+
+O backend por padrão sobe na porta `5010` (pode ser alterada com `PORT`).
 
 ### Frontend
 
-```bash
-cd Frontend
+```powershell
+cd 'c:\projects\Projetos - Programação Web\Projeto Forms\ProvaSurpresa-2.0\ProvaSurpresa\Frontend'
 npm install
 npm run dev
 ```
 
-O frontend estará disponível em `http://localhost:3000`
+O frontend estará disponível em `http://localhost:3000` e, em desenvolvimento, as chamadas para `/api` são encaminhadas para `http://localhost:5010` via proxy do Vite.
 
-## Funcionalidades
+## Principais melhorias aplicadas
 
-### Autenticação
-- Login e registro de usuários
-- Autenticação via JWT
-- Suporte para roles (aluno/professor)
+- JWT agora inclui expiração configurável (`JWT_EXPIRES_IN`, padrão `1h`). Em produção `JWT_SECRET` é obrigatório e a aplicação falha na inicialização se não estiver definido.
+- CORS no backend pode ser restrito pela variável `FRONTEND_URL` (recomendado em produção). Em desenvolvimento continua liberado por conveniência.
+- Conexão com MySQL: a ausência de conexão fará a aplicação encerrar no startup (evita rodar sem persistência). Logs não expõem senhas.
 
-### Novas funções e melhorias
+## Endpoints principais
 
-- **Autenticação JWT aprimorada:** funções utilitárias `generateToken`, `getTokenInfo` e `getAuthentication` estão disponíveis em `Backend/src/utils/jwt.js`. O secret pode ser configurado pela variável de ambiente `JWT_SECRET`; caso não esteja definida o projeto emite um aviso em ambientes de desenvolvimento.
-- **Autorização por função (role):** endpoints protegidos aceitam verificações de role. Por exemplo, a criação de provas (`POST /provas`) exige que o usuário tenha `role: 'professor'`.
-- **Validações estendidas ao criar provas:** a rota `POST /provas` valida título, número máximo de perguntas e alternativas, comprimento máximo de textos e garante que cada pergunta tenha ao menos uma alternativa correta. Erros retornam códigos e mensagens específicas (ex.: `titulo_obrigatorio`, `pergunta_invalida`).
-- **Serviço de arquivos estáticos para imagens:** o backend expõe o diretório `public/storage` em `/public/storage` para servir imagens de perguntas (`GET /public/storage/...`).
-- **Envio e pontuação de respostas:** a rota `POST /respostas` permite submeter respostas (body: `{ prova, itens: [{ pergunta, alternativa }] }`) e, ao salvar, tenta calcular a pontuação retornando `{ id, score }`. Se o cálculo falhar, ao menos o `id` da submissão é retornado.
-- **Melhor tratamento de segurança de senhas:** no registro a senha é hasheada com `bcryptjs` antes de armazenar.
+- `POST /login` - Autenticação (retorna JWT)
+- `POST /register` - Criar usuário
+- `GET /provas` - Listar provas
+- `GET /provas/:id` - Obter prova com perguntas e alternativas
+- `POST /provas` - Criar prova (requer role `professor`)
+- `POST /respostas` - Submeter respostas
+- `GET /respostas/me` - Listar respostas do usuário autenticado
 
-### Para Alunos
-- Visualizar provas disponíveis
-- Responder provas
-- Ver histórico de respostas
+## Variáveis de ambiente importantes
 
-### Para Professores
-- Criar novas provas
-- Adicionar múltiplas perguntas
-- Configurar alternativas com resposta correta
-- Adicionar imagens às perguntas (opcional)
-- Todas as funcionalidades de aluno
+- `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` — conexão MySQL
+- `JWT_SECRET` — segredo para assinar JWT (obrigatório em `NODE_ENV=production`)
+- `JWT_EXPIRES_IN` — tempo de expiração do token (ex.: `1h`, `30m`)
+- `FRONTEND_URL` — URL do frontend permitida via CORS (ex.: `http://localhost:3000`)
 
-## API Endpoints
+## Próximos passos recomendados
 
-### Autenticação
-- `POST /login` - Login de usuário
-- `POST /register` - Registro de novo usuário
+- Implementar refresh tokens e política de invalidação de tokens para logout server-side.
+- Migrar token para cookie `HttpOnly` se desejar maior proteção contra XSS.
+- Adicionar rate-limiting nas rotas sensíveis (`/login`, `/register`).
+- Criar scripts de migração/seed para o banco de dados e testes automatizados.
 
-### Provas
-- `GET /provas` - Listar todas as provas
-- `GET /provas/:id` - Obter detalhes de uma prova
-- `POST /provas` - Criar nova prova (professor)
+---
 
-Nota: `POST /provas` aceita um JSON com `titulo` e `perguntas` (cada pergunta com `pergunta`, `ordem`, `imagem` opcional e `alternativas` com `descricao` e `correta`).
-
-### Respostas
-- `POST /respostas` - Submeter respostas de uma prova
-- `GET /respostas/me` - Listar respostas do usuário logado
-
-Detalhes: `POST /respostas` retorna o `id` da submissão e, quando possível, o `score` calculado.
-
-## Tecnologias Utilizadas
-
-### Backend
-- Express.js
-- MySQL2
-- JWT (jsonwebtoken)
-- CORS
-
-### Frontend
-- React 18
-- React Router DOM
-- Axios
-- Vite
-
-## Desenvolvimento
-
-Para desenvolvimento, execute ambos os servidores (backend e frontend) simultaneamente em terminais separados.
-
-## Portas
-
-- Backend: 5010
-- Frontend: 3000
-
-O frontend está configurado para fazer proxy das requisições `/api/*` para o backend automaticamente.
+Se quiser, eu posso abrir um PR com essas mudanças e adicionar testes ou implementar refresh tokens a seguir. Diga qual alteração prefere que eu faça a seguir.
